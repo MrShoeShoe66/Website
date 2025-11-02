@@ -138,9 +138,86 @@
             border: 1px solid #444;
         }
 
+        .contact-info a {
+            color: #ffffff;
+            margin: 0 1rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .contact-info a:hover {
+            color: #4dabf7;
+        }
+
         p {
             color: #f0f0f0;
             line-height: 1.7;
+        }
+
+        /* Contact form styles (placed inside contact section) */
+        .contact-form {
+            margin-top: 1.25rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: stretch;
+        }
+
+        .contact-form .row {
+            display: flex;
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .contact-form input[type="text"],
+        .contact-form textarea {
+            background-color: #0f0f0f;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 0.6rem;
+            border-radius: 6px;
+            width: 100%;
+            resize: vertical;
+        }
+
+        .contact-form textarea {
+            min-height: 100px;
+        }
+
+        .contact-form .actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-form button {
+            background-color: #4dabf7;
+            color: #000;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.15s ease, opacity 0.15s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contact-form button:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+
+        @media (max-width: 700px) {
+            .contact-form .row {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -158,26 +235,26 @@
 
     <section id="about" class="about">
         <h2>About Me</h2>
-        <p>hey i’m MrShoe, I’m a tech hobbyist and enjoy working on develop projects in my free time. I’m most familiar with JavaScript but i also know Python, Java, CSS/HTML, C++ and a few more. This page is generally not updated that often so if you wanna see what i’ve been working on check my github at MrShoeShoe66</p>
+        <p>hey I'm MrShoe, a tech hobbyist and enjoy working on develop projects in my free time. I'm most familiar with JavaScript and C++ but I also know Python, Java, CSS/HTML and a few other languages. I'm always looking to learn new things and improve my skills!</p>
     </section>
 
     <section id="projects">
         <h2>My Projects</h2>
         <div class="projects">
             <div class="project-card">
-                <div class="project-img"></div>
-                <h3>Work In Progress...</h3>
-                <p>WIP...</p>
+                <!-- <div class="project-img"></div> -->
+                <h3>Custom Processor</h3>
+                <p>Working on the ALU...</p>
             </div>
             <div class="project-card">
-                <div class="project-img"></div>
-                <h3>Work In Progress...</h3>
-                <p>WIP...</p>
+                <!-- <div class="project-img"></div> -->
+                <h3>Custom Game Engine</h3>
+                <p>Making shadows work...</p>
             </div>
             <div class="project-card">
-                <div class="project-img"></div>
-                <h3>Work In Progress...</h3>
-                <p>WIP...</p>
+                <!-- <div class="project-img"></div> -->
+                <h3>Making Some Music</h3>
+                <p>Release soon?</p>
             </div>
         </div>
     </section>
@@ -185,16 +262,34 @@
     <section id="contact">
         <h2>Contact Me</h2>
         <div class="contact-info">
-            <p>Email: mrshoeshoe66@gmail.com</p>
+            <p>Email: <a href="mailto:mrshoeshoe66@gmail.com">mrshoeshoe66@gmail.com</a></p>
             <p>Location: United States</p>
             <div class="social-links">
                 <a href="https://github.com/MrShoeShoe66">GitHub</a>
+            </div>
+
+            <!-- Contact menu directly INSIDE the contact-info -->
+            <div class="contact-form" aria-label="Contact form">
+                <!-- store email for reuse -->
+                <div style="display:none" id="site-email" data-email="mrshoeshoe66@gmail.com"></div>
+
+                <div class="row" style="align-items:center;">
+                    <input id="mailto-subject" type="text" placeholder="Subject (e.g. Project inquiry)" aria-label="Email subject">
+                </div>
+
+                <textarea id="mailto-body" placeholder="Write your message here…" aria-label="Email body"></textarea>
+
+                <div class="actions">
+                    <button id="mailto-send">Email Me</button>
+                </div>
             </div>
         </div>
     </section>
 
     <footer>
-        <p>&copy; 2025 MrShoe. All rights reserved.</p>
+        <div style="max-width:1200px; margin:0 auto;">
+            <p>&copy; 2025 MrShoe. All rights reserved.</p>
+        </div>
     </footer>
 
     <script>
@@ -232,8 +327,8 @@
                     history.replaceState(null, null, window.location.pathname);
                 }
             });
-        }, { 
-            rootMargin: '-10% 0px' 
+        }, {
+            rootMargin: '-10% 0px'
         });
 
         headerObserver.observe(header);
@@ -247,10 +342,10 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     isAnySectionVisible = true;
-                    
+
                     // Remove active class from all links
                     navLinks.forEach(link => link.classList.remove('active'));
-                    
+
                     // Add active class to corresponding link
                     const activeId = entry.target.id;
                     const activeLink = document.querySelector(`nav a[href="#${activeId}"]`);
@@ -275,6 +370,47 @@
         if (window.scrollY === 0) {
             history.replaceState(null, null, window.location.pathname);
         }
+
+        /* Contact form JS: autogenerate mailto link (inside contact-info) */
+        (function() {
+            const siteEmailEl = document.getElementById('site-email');
+            const emailAddress = siteEmailEl ? siteEmailEl.dataset.email || 'mrshoeshoe66@gmail.com' : 'mrshoeshoe66@gmail.com';
+
+            const subjectInput = document.getElementById('mailto-subject');
+            const bodyInput = document.getElementById('mailto-body');
+            const sendBtn = document.getElementById('mailto-send');
+
+            function buildMailto({ to, subject, body }) {
+                const s = subject ? encodeURIComponent(subject) : '';
+                const b = body ? encodeURIComponent(body) : '';
+                let mailto = `mailto:${to}`;
+                const params = [];
+                if (s) params.push(`subject=${s}`);
+                if (b) params.push(`body=${b}`);
+                if (params.length) mailto += `?${params.join('&')}`;
+                return mailto;
+            }
+
+            sendBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const subj = subjectInput.value.trim();
+                const body = bodyInput.value.trim();
+
+                const mailto = buildMailto({ to: emailAddress, subject: subj, body: body });
+
+                // Open default mail client
+                window.location.href = mailto;
+            });
+        })();
     </script>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZLVHZ7G34C"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-ZLVHZ7G34C');
+</script>
 </body>
 </html>
